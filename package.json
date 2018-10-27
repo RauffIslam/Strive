@@ -1,8 +1,8 @@
 {
   "name": "aurora",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aurora Bot",
-  "main": "Strive.js",
+  "main": "src/Strive.js",
   "author": "Rauf",
   "license": "MIT",
   "devDependencies": {
