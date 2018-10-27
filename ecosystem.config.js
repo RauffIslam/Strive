@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'Strive',
-    script: './src/Strive.js',
+    script: 'src/Strive.js',
     watch: ['./src'],
     ignore_watch: ['node_modules', '*.log'],
     watch_options: {
