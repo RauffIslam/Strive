@@ -4,18 +4,17 @@ const r = require('rethinkdb')
 // Config
 const config = require('../priv/config.json')
 
-var connection
+// Logger
+const logger = require('./logger')
+
+// Connect to DB
 r.connect(
   { host: config.db.host, port: config.db.port, db: 'Strive' },
   async (err, conn) => {
-    if (err) throw err
-    connection = conn
+    if (err) logger.error(err)
+    // Hack connection onto rethink so it can be used across files
     r.connection = conn
-    console.log('Connected')
-    r.tableList().run(connection, (err, res) => {
-      if (err) throw err
-      console.log(res)
-    })
+    logger.log('Connected to RethinkDB')
   }
 )
 

@@ -1,25 +1,9 @@
 // Node Modules
 const Eris = require('eris')
 require('eris-additions')(Eris)
-const winston = require('winston')
 
 // Logger
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
-})
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple()
-    })
-  )
-}
+const logger = require('./utils/logger')
 
 // Database
 const db = require('./utils/Rethink')
