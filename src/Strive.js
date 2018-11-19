@@ -1,10 +1,29 @@
 // Node Modules
 const Eris = require('eris')
-const mongoose = require('mongoose')
 require('eris-additions')(Eris)
+const winston = require('winston')
 
 // Logger
-const Logger = require('./utils/Logger')
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+})
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  )
+}
+
+// Database
+const db = require('./utils/Rethink')
+
 // Loaders
 const EventLoader = require('./utils/EventLoader')
 const CommandLoader = require('./utils/CommandLoader')
@@ -21,46 +40,25 @@ const Strive = new Eris.Client(config.token, {
   autoreconnect: true
 })
 
-// Logger
-const logger = new Logger()
-
 // Loaders
-EventLoader(Strive, logger)
+EventLoader(Strive, logger, db)
 CommandLoader(Strive, logger)
 
 Strive.once('ready', async () => {
   try {
     // Log once the client is ready
-    logger.LogToConsole({
-      type: 'normal',
-      message: 'Ready!'
-    })
+    logger.info('Ready')
     // Set status
     Strive.editStatus('online', {
       name: 's?help for help'
     })
-    var db = await mongoose.connect(config.dbURL, { useNewUrlParser: true })
-    Strive.db = db.connection.db
-
-    logger.LogToConsole({
-      type: 'Normal',
-      message: 'Connected to DB',
-      color: 'green'
-    })
-  } catch (e) {
-    logger.LogToConsole({
-      type: 'error',
-      message: e,
-      color: 'red'
-    })
+  } catch (err) {
+    logger.error(err)
   }
 })
 
 // Strive Declarations
 Strive.commands = new Map()
-Strive.session = {
-  messagesSeen: 0
-}
 
 // Connect to Discord
 Strive.connect()

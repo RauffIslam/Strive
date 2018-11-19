@@ -1,55 +1,31 @@
 // Node Modules
 const fs = require('fs')
 
-async function EventLoader (Strive, logger) {
+async function EventLoader(Strive, logger, db) {
   // Event Loader
   fs.readdir('./src/events', async (err, files) => {
     try {
       if (err) {
-        return logger.LogToConsole({
-          type: 'error',
-          message: err,
-          color: 'red'
-        })
+        return logger.error(err)
       }
-      logger.LogToConsole({
-        type: 'normal',
-        message: 'Attempting to load events',
-        color: 'green'
-      })
+      logger.info('Loading Events')
       await files.forEach(file => {
         try {
           const event = require(`../events/${file}`)
-          logger.LogToConsole({
-            type: 'normal',
-            message: `Event: ${event.name}`,
-            color: 'green'
-          })
-          Strive.on(event.name, async (attrib) => {
+          logger.info(`Event: ${event.name}`)
+          Strive.on(event.name, async attrib => {
             try {
-              event.func(attrib, Strive, logger)
-            } catch (e) {
-              logger.LogToConsole({
-                type: 'error',
-                message: e,
-                color: 'red'
-              })
+              event.func(attrib, Strive, logger, db)
+            } catch (err) {
+              logger.error(err)
             }
           })
-        } catch (e) {
-          logger.LogToConsole({
-            type: 'error',
-            message: e,
-            color: 'red'
-          })
+        } catch (err) {
+          logger.error(err)
         }
       })
-    } catch (e) {
-      logger.LogToConsole({
-        type: 'error',
-        message: e,
-        color: 'red'
-      })
+    } catch (err) {
+      logger.error(err)
     }
   })
 }

@@ -1,16 +1,12 @@
 // Node Modules
 const fs = require('fs')
 
-async function CommandLoader (Strive, logger) {
+async function CommandLoader(Strive, logger) {
   // Command Loader
   fs.readdir('./src/cmds', async (err, files) => {
     try {
       if (err) {
-        return logger.LogToConsole({
-          type: 'error',
-          message: err,
-          color: 'red'
-        })
+        logger.error(err)
       }
 
       if (!Strive.commands) Strive.commands = new Map()
@@ -18,26 +14,14 @@ async function CommandLoader (Strive, logger) {
       await files.forEach(file => {
         try {
           const cmd = require(`../cmds/${file}`)
-          logger.LogToConsole({
-            type: 'normal',
-            message: `Command: ${cmd.name}`,
-            color: 'green'
-          })
+          logger.info(`Command: ${cmd.name}`)
           Strive.commands.set(cmd.name, cmd.func)
-        } catch (e) {
-          logger.LogToConsole({
-            type: 'Error',
-            message: e,
-            color: 'red'
-          })
+        } catch (err) {
+          logger.error(err)
         }
       })
-    } catch (e) {
-      await logger.LogToConsole({
-        type: 'Error',
-        message: e,
-        color: 'red'
-      })
+    } catch (err) {
+      logger.error(err)
     }
   })
 }
